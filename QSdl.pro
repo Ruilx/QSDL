@@ -16,13 +16,21 @@ SOURCES += main.cpp\
         widget.cpp \
     QSdl/qsdlexception.cpp \
     QSdl/qsdlvideo.cpp \
-    QSdl/qsdlwidget.cpp
+    QSdl/qsdlwidget.cpp \
+    QSdl/com/qsdlpixelformat.cpp \
+    QSdl/com/qsdlpalette.cpp \
+    QSdl/com/qsdlsurface.cpp \
+    QSdl/com/qsdlvideoinfo.cpp
 
 HEADERS  += widget.h \
     QSdl/global.h \
     QSdl/qsdlexception.h \
     QSdl/qsdlvideo.h \
-    QSdl/qsdlwidget.h
+    QSdl/qsdlwidget.h \
+    QSdl/com/qsdlpixelformat.h \
+    QSdl/com/qsdlpalette.h \
+    QSdl/com/qsdlsurface.h \
+    QSdl/com/qsdlvideoinfo.h
 
 win32: LIBS += -L$$PWD/lib/ -llibSDL.dll
 
