@@ -1,7 +1,7 @@
 #ifndef QSDL_H
 #define QSDL_H
 
-#include <QWidget>
+#include <QtWidgets>
 #include <QDialog>
 #include <SDL/SDL.h>
 #include "global.h"
@@ -10,6 +10,7 @@
 class QSdlWidget : public QWidget
 {
 	Q_OBJECT
+	QWidget *parent = nullptr;
 
 	SDL_Surface *mainSurface = nullptr;
 

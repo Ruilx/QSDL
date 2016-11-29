@@ -9,9 +9,9 @@ class Widget : public QWidget
 {
 	Q_OBJECT
 	QSdlWidget *w;
-	//QLabel *l = new QLabel("123", this);
+	QLabel *l = new QLabel("123", this);
 public:
-	Widget(QWidget *parent = 0);
+	Widget(QWidget *parent = 0, Qt::WindowFlags f = Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
 	~Widget();
 };
 

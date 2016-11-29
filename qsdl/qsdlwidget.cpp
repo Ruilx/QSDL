@@ -2,17 +2,14 @@
 
 #define setOk(v) if(ok){ *ok = (v); }
 
-QSdlWidget::QSdlWidget(QSdlWidget::QSdlInitDevices devices, QWidget *parent, Qt::WindowFlags flags, bool *ok) throw(QSdlException): QWidget(parent, flags)
+QSdlWidget::QSdlWidget(QSdlWidget::QSdlInitDevices devices, QWidget *parent, Qt::WindowFlags flags, bool *ok) throw(QSdlException): QWidget(nullptr, flags), parent(parent)
 {
 	setOk(false);
 
 	this->setAttribute(Qt::WA_PaintOnScreen, true);
 	this->setUpdatesEnabled(false);
 
-	// BUG
-	if(parent == nullptr){
-		this->SetVideoSdlWindowId(this->winId());
-	}
+	this->SetVideoSdlWindowId(this->winId());
 
 	try{
 		if(SDL_Init(devices)< 0){
@@ -24,13 +21,18 @@ QSdlWidget::QSdlWidget(QSdlWidget::QSdlInitDevices devices, QWidget *parent, Qt:
 		throw;
 	}
 
-	this->mainSurface = SDL_SetVideoMode(600, 480, 8, SDL_SWSURFACE/* | SDL_DOUBLEBUF*/);
-	this->setFixedSize(600, 480);
+	this->mainSurface = SDL_SetVideoMode(640, 480, 8, SDL_HWSURFACE | SDL_DOUBLEBUF);
+	this->setFixedSize(640, 480);
+
+	SDL_Surface *s = SDL_LoadBMP(QString(QDir::currentPath() + "/data/background/bg.bmp").toLocal8Bit().data());
+
+	SDL_BlitSurface(s, nullptr, this->mainSurface, nullptr);
+	SDL_Flip(s);
 
 	setOk(true);
 }
 
-QSdlWidget::QSdlWidget(QWidget *parent, Qt::WindowFlags flags, bool *ok)throw(QSdlException) : QWidget(parent, flags)
+QSdlWidget::QSdlWidget(QWidget *parent, Qt::WindowFlags flags, bool *ok)throw(QSdlException) : QWidget(nullptr, flags), parent(parent)
 {
 	setOk(false);
 
@@ -75,7 +77,7 @@ void QSdlWidget::quit() Q_DECL_NOTHROW
 
 void QSdlWidget::setToEnvironment(QString name, QString value)
 {
-	qDebug() << "Environment: " << name << "=" << value;
+	qDebug() << tr("[Environment]: %1=%2").arg(name).arg(value);
 	SDL_putenv(QString(name + "=" + value).toLocal8Bit().data());
 }
 

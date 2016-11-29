@@ -8,6 +8,10 @@
 class QSdlVideo
 {
 public:
+	enum SdlVideoMode{
+
+	};
+
 	QSdlVideo();
 };
 
