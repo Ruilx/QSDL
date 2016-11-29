@@ -1,6 +1,7 @@
 # QSDL Project
 
 This is not a offical SDL interface using with Qt
+
 Just personally hobby.
 
 This component included SDL 1.2 (Not 2.x) library (modified something so that 
