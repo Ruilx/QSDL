@@ -12,4 +12,4 @@ me to this project, please contact RuilxAlxa@qq.com to setup a contributor
 to you, any one who wants help or improve, can do Qt/C++ programming is just ok!
 
 If there has bugs?
-Please contact Ruilx<RuilxAlxa@qq.com>
+Please contact with <RuilxAlxa@qq.com>
