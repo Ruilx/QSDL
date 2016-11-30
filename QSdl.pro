@@ -20,7 +20,9 @@ SOURCES += main.cpp\
     QSdl/com/qsdlpixelformat.cpp \
     QSdl/com/qsdlpalette.cpp \
     QSdl/com/qsdlsurface.cpp \
-    QSdl/com/qsdlvideoinfo.cpp
+    QSdl/com/qsdlvideoinfo.cpp \
+    QSdl/com/qsdlkeyboardmap.cpp \
+    QSdl/qsdlevent.cpp
 
 HEADERS  += widget.h \
     QSdl/global.h \
@@ -30,7 +32,9 @@ HEADERS  += widget.h \
     QSdl/com/qsdlpixelformat.h \
     QSdl/com/qsdlpalette.h \
     QSdl/com/qsdlsurface.h \
-    QSdl/com/qsdlvideoinfo.h
+    QSdl/com/qsdlvideoinfo.h \
+    QSdl/com/qsdlkeyboardmap.h \
+    QSdl/qsdlevent.h
 
 win32: LIBS += -L$$PWD/lib/ -llibSDL.dll
 
