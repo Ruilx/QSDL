@@ -20,7 +20,7 @@ public:
 signals:
 	void sdlQuitSig();
 	void sdlShowHideSig(bool show);
-	void sdlKeySig(QEvent::Type type, Qt::Key key, Qt::KeyboardModifiers modifiers, QString keyString);
+	void sdlKeySig(int eventType, int key, int modifiers, QString keyString);
 public slots:
 	void listenSdlEvent(){
 		SDL_Event sdlEvent;
@@ -29,7 +29,7 @@ public slots:
 			if(hasEvents == 0 || sdlEvent.type == 0){
 				continue;
 			}
-			switch(sdlEvent->type){
+			switch(sdlEvent.type){
 				case SDL_NOEVENT:
 					break;
 				case SDL_ACTIVEEVENT:
@@ -42,18 +42,18 @@ public slots:
 				case SDL_KEYDOWN:
 				{
 					Qt::Key qKey = qKeyMap->getQtKey(sdlEvent.key.keysym.sym);
-					Qt::KeyboardModifiers qMod = qKeyMap->getQtModifier(qKey, sdlEvent.key.keysym.mod);
+					Qt::KeyboardModifiers qMod = qKeyMap->getQtModifier(sdlEvent.key.keysym.sym, sdlEvent.key.keysym.mod);
 					if(qKey != Qt::Key_unknown){
-						emit this->sdlKeySig(QEvent::KeyPress, qKey, qMod, QString(SDL_GetKeyName(sdlEvent.key.keysym.sym)));
+						emit this->sdlKeySig((int)QEvent::KeyPress, (int)qKey, (int)qMod, QString(SDL_GetKeyName(sdlEvent.key.keysym.sym)));
 					}
 					break;
 				}
 				case SDL_KEYUP:
 				{
 					Qt::Key qKey = qKeyMap->getQtKey(sdlEvent.key.keysym.sym);
-					Qt::KeyboardModifiers qMod = qKeyMap->getQtModifier(qKey, sdlEvent.key.keysym.mod);
+					Qt::KeyboardModifiers qMod = qKeyMap->getQtModifier(sdlEvent.key.keysym.sym, sdlEvent.key.keysym.mod);
 					if(qKey != Qt::Key_unknown){
-						emit this->sdlKeySig(QEvent::KeyRelease, qKey, qMod, QString(SDL_GetKeyName(sdlEvent.key.keysym.sym)));
+						emit this->sdlKeySig((int)QEvent::KeyRelease, (int)qKey, (int)qMod, QString(SDL_GetKeyName(sdlEvent.key.keysym.sym)));
 					}
 				}
 				default:

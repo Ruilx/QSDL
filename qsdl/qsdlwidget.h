@@ -277,6 +277,29 @@ public:
 signals:
 
 public slots:
+
+private slots:
+	void sdlEventShowHideSlot(bool show){
+		if(show){
+			QApplication::sendEvent(this, new QShowEvent());
+		}else{
+			QApplication::sendEvent(this, new QHideEvent());
+		}
+	}
+
+	void sdlEventKeySigSlot(int eventType, int eventKey, int eventModifiers, QString text){
+		QEvent::Type type = (QEvent::Type)eventType;
+		Qt::Key key = (Qt::Key)eventKey;
+		Qt::KeyboardModifiers modifiers = (Qt::KeyboardModifiers)eventModifiers;
+		if(type == QEvent::KeyPress || type == QEvent::KeyRelease){
+			QKeyEvent e(type, key, modifiers, text);
+			QApplication::sendEvent(this, &e);
+		}
+	}
+
+	void sdlEventQuitSlot(){
+		this->close();
+	}
 };
 
 #endif // QSDL_H

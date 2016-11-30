@@ -37,8 +37,9 @@ QSdlWidget::QSdlWidget(QSdlWidget::QSdlInitDevices devices, QWidget *parent, Qt:
 	connect(sdlEventThread, SIGNAL(started()), this->sdlEvent, SLOT(listenSdlEvent()));
 	connect(sdlEventThread, SIGNAL(finished()), this->sdlEvent, SLOT(deleteLater()));
 	connect(this->sdlEvent, SIGNAL(sdlQuitSig()), sdlEventThread, SLOT(quit()));
+	connect(this->sdlEvent, SIGNAL(sdlQuitSig()), this, SLOT(sdlEventQuitSlot()));
 	connect(this->sdlEvent, SIGNAL(sdlShowHideSig(bool)), this, SLOT(sdlEventShowHideSlot(bool)));
-	connect(this->sdlEvent, SIGNAL(sdlKeySig(QEvent::Type,Qt::Key,Qt::KeyboardModifiers,QString)), this, SLOT(sdlEventKeySigSlot(QEvent::Type,Qt::Key,Qt::KeyboardModifiers,QString)));
+	connect(this->sdlEvent, SIGNAL(sdlKeySig(int,int,int,QString)), this, SLOT(sdlEventKeySigSlot(int,int,int,QString)));
 	sdlEventThread->start();
 
 }
@@ -56,7 +57,6 @@ QSdlWidget::QSdlWidget(QWidget *parent, Qt::WindowFlags flags, bool *ok)throw(QS
 
 	setOk(true);
 
-	this->qKeyMap = new QSdlKeyboardMap();
 }
 
 bool QSdlWidget::initSubSystem(QSdlWidget::QSdlInitDevices devices) throw(QSdlException)
