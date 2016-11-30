@@ -21,8 +21,9 @@ QSdlWidget::QSdlWidget(QSdlWidget::QSdlInitDevices devices, QWidget *parent, Qt:
 		throw;
 	}
 
-	this->mainSurface = SDL_SetVideoMode(640, 480, 8, SDL_HWSURFACE | SDL_DOUBLEBUF);
-	this->setFixedSize(640, 480);
+	this->mainSurface = SDL_SetVideoMode(640, 480, 8, SDL_SWSURFACE | SDL_DOUBLEBUF);
+	//this->resize(SDL_GetVideoInfo()->current_w, SDL_GetVideoInfo()->current_h);
+	this->setFixedSize(SDL_GetVideoInfo()->current_w, SDL_GetVideoInfo()->current_h);
 
 	SDL_Surface *s = SDL_LoadBMP(QString(QDir::currentPath() + "/data/background/bg.bmp").toLocal8Bit().data());
 
@@ -30,6 +31,16 @@ QSdlWidget::QSdlWidget(QSdlWidget::QSdlInitDevices devices, QWidget *parent, Qt:
 	SDL_Flip(s);
 
 	setOk(true);
+
+	QThread *sdlEventThread = new QThread(this);
+	this->sdlEvent->moveToThread(sdlEventThread);
+	connect(sdlEventThread, SIGNAL(started()), this->sdlEvent, SLOT(listenSdlEvent()));
+	connect(sdlEventThread, SIGNAL(finished()), this->sdlEvent, SLOT(deleteLater()));
+	connect(this->sdlEvent, SIGNAL(sdlQuitSig()), sdlEventThread, SLOT(quit()));
+	connect(this->sdlEvent, SIGNAL(sdlShowHideSig(bool)), this, SLOT(sdlEventShowHideSlot(bool)));
+	connect(this->sdlEvent, SIGNAL(sdlKeySig(QEvent::Type,Qt::Key,Qt::KeyboardModifiers,QString)), this, SLOT(sdlEventKeySigSlot(QEvent::Type,Qt::Key,Qt::KeyboardModifiers,QString)));
+	sdlEventThread->start();
+
 }
 
 QSdlWidget::QSdlWidget(QWidget *parent, Qt::WindowFlags flags, bool *ok)throw(QSdlException) : QWidget(nullptr, flags), parent(parent)
@@ -44,6 +55,8 @@ QSdlWidget::QSdlWidget(QWidget *parent, Qt::WindowFlags flags, bool *ok)throw(QS
 	}
 
 	setOk(true);
+
+	this->qKeyMap = new QSdlKeyboardMap();
 }
 
 bool QSdlWidget::initSubSystem(QSdlWidget::QSdlInitDevices devices) throw(QSdlException)
