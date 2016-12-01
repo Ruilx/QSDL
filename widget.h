@@ -16,6 +16,16 @@ class Widget : public QWidget
 //	bool nativeEvent(const QByteArray &eventType, void *message, long *result){
 //		qDebug() << "Event Entry";
 //	}
+	void mouseMoveEvent(QMouseEvent *event){
+		qDebug() << "type:" << event->type()
+				 << "buttons:" << event->buttons()
+				 << "button:" << event->button()
+				 << "pos:" << event->pos()
+				 << "local pos:" << event->localPos()
+				 << "screen pos:" << event->screenPos()
+				 << "global pos:" << event->globalPos()
+				 << "modifiers:" << event->modifiers();
+	}
 
 public:
 	Widget(QWidget *parent = 0, Qt::WindowFlags f = Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);

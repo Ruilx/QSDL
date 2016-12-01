@@ -2,9 +2,59 @@
 
 #define setOk(v) if(ok){ *ok = (v); }
 
+void QSdlWidget::keyPressEvent(QKeyEvent *event){
+	Qt::KeyboardModifiers modifier = event->modifiers();
+	int key = event->key();
+	if((key & (~QKeyMask)) == 0){
+		event->ignore();
+		return;
+	}else{
+		key = key & QKeyMask;
+	}
+	QString keyStr = event->text();
+	qDebug() << "You [Pressed] key value is MOD:" << modifier << "KEY:" << QString::number(key, 16) << "STR:" << keyStr;
+}
+
+void QSdlWidget::keyReleaseEvent(QKeyEvent *event){
+	Qt::KeyboardModifiers modifier = event->modifiers();
+	int key = event->key();
+	if((key & (~QKeyMask)) == 0){
+		event->ignore();
+		return;
+	}else{
+		key = key & QKeyMask;
+	}
+	QString keyStr = event->text();
+	qDebug() << "You (Release) key value is MOD:" << modifier << "KEY:" << QString::number(key, 16) << "STR:" << keyStr;
+}
+
+void QSdlWidget::createSdlEventThread(QSdlEvent *eventObject){
+	if(eventObject == nullptr){
+		qDebug() << "This object hasn't init!";
+		return;
+	}
+	if(eventObject->parent() != nullptr){
+		qDebug() << "Event Object has a parent!";
+		return;
+	}
+	QThread *eventThread = new QThread(this);
+	eventThread->setObjectName("QSdlEventThread");
+	eventObject->moveToThread(eventThread);
+	this->threadList.append(eventThread);
+	connect(eventThread, SIGNAL(started()), eventObject, SLOT(listenSdlEvent()));
+	connect(eventThread, SIGNAL(finished()), eventObject, SLOT(deleteLater()));
+	connect(eventObject, SIGNAL(finish(QThread*)), this, SLOT(joinThread(QThread*)));
+	connect(eventObject, SIGNAL(sdlQuitSig()), this, SLOT(sdlEventQuitSlot()));
+	connect(eventObject, SIGNAL(sdlShowHideSig(bool)), this, SLOT(sdlEventShowHideSlot(bool)));
+	connect(eventObject, SIGNAL(sdlKeySig(int,int,int,QString)), this, SLOT(sdlEventKeySigSlot(int,int,int,QString)));
+	connect(eventObject, SIGNAL(sdlMouseMoveSig(int,QPoint)), this, SLOT(sdlEventMouseMoveSigSlot(int,QPoint)));
+	eventThread->start();
+}
+
 QSdlWidget::QSdlWidget(QSdlWidget::QSdlInitDevices devices, QWidget *parent, Qt::WindowFlags flags, bool *ok) throw(QSdlException): QWidget(nullptr, flags), parent(parent)
 {
 	setOk(false);
+	this->initDevices = (QSdlInitDevices)((int)devices | (int)this->initDevices);
 
 	this->setAttribute(Qt::WA_PaintOnScreen, true);
 	this->setUpdatesEnabled(false);
@@ -32,15 +82,7 @@ QSdlWidget::QSdlWidget(QSdlWidget::QSdlInitDevices devices, QWidget *parent, Qt:
 
 	setOk(true);
 
-	QThread *sdlEventThread = new QThread(this);
-	this->sdlEvent->moveToThread(sdlEventThread);
-	connect(sdlEventThread, SIGNAL(started()), this->sdlEvent, SLOT(listenSdlEvent()));
-	connect(sdlEventThread, SIGNAL(finished()), this->sdlEvent, SLOT(deleteLater()));
-	connect(this->sdlEvent, SIGNAL(sdlQuitSig()), sdlEventThread, SLOT(quit()));
-	connect(this->sdlEvent, SIGNAL(sdlQuitSig()), this, SLOT(sdlEventQuitSlot()));
-	connect(this->sdlEvent, SIGNAL(sdlShowHideSig(bool)), this, SLOT(sdlEventShowHideSlot(bool)));
-	connect(this->sdlEvent, SIGNAL(sdlKeySig(int,int,int,QString)), this, SLOT(sdlEventKeySigSlot(int,int,int,QString)));
-	sdlEventThread->start();
+	this->createSdlEventThread(this->sdlEvent);
 
 }
 
@@ -59,6 +101,27 @@ QSdlWidget::QSdlWidget(QWidget *parent, Qt::WindowFlags flags, bool *ok)throw(QS
 
 }
 
+QSdlWidget::~QSdlWidget(){
+	SDL_Event SdlRequestQuitEvent;
+	SdlRequestQuitEvent.type = SDL_QUIT;
+	SdlRequestQuitEvent.quit.type = SDL_QUIT;
+	int result = SDL_PushEvent(&SdlRequestQuitEvent);
+	if(result < 0){
+		qDebug() << "SDL_PushEvent failed:" << SDL_GetError();
+		return;
+	}
+
+	for(QThread *t: this->threadList){
+		if(t != nullptr){
+			t->quit();
+			t->wait();
+			delete t;
+			t = nullptr;
+		}
+	}
+	this->quit();
+}
+
 bool QSdlWidget::initSubSystem(QSdlWidget::QSdlInitDevices devices) throw(QSdlException)
 {
 	try{
@@ -69,7 +132,7 @@ bool QSdlWidget::initSubSystem(QSdlWidget::QSdlInitDevices devices) throw(QSdlEx
 	}catch(...){
 		throw;
 	}
-
+	this->initDevices = (QSdlInitDevices)((int)devices | (int)this->initDevices);
 	return true;
 }
 
@@ -81,10 +144,12 @@ QSdlWidget::QSdlInitDevices QSdlWidget::isInit(QSdlWidget::QSdlInitDevices devic
 void QSdlWidget::quitSubSystem(QSdlWidget::QSdlInitDevices devices) Q_DECL_NOTHROW
 {
 	SDL_QuitSubSystem(devices);
+	this->initDevices = (QSdlInitDevices)((int)devices & (~(int)this->initDevices));
 }
 
 void QSdlWidget::quit() Q_DECL_NOTHROW
 {
+	SDL_QuitSubSystem(this->initDevices);
 	SDL_Quit();
 }
 

@@ -61,6 +61,8 @@ Widget::Widget(QWidget *parent, Qt::WindowFlags f)
 	lay->setMargin(0);
 	//lay->setSizeConstraint(QLayout::SetFixedSize);
 
+	this->setMouseTracking(true);
+
 }
 
 Widget::~Widget()

@@ -495,9 +495,19 @@ Qt::Key QSdlKeyboardMap::getQtKey(SDLKey key){
 
 Qt::KeyboardModifiers QSdlKeyboardMap::getQtModifier(SDLKey key, SDLMod mod){
 	Qt::KeyboardModifier qmod = this->keyModMap.value(key, Qt::NoModifier);
+
 	if(mod == KMOD_NONE){
 		return qmod;
 	}else{
-		return this->modMap.value(mod, Qt::NoModifier);
+		int m = (int)mod;
+		int qtM = 0x00000000;
+		for(int i = 0x00000001; i <= 0x40000000 && i > 0; i <<= 1){
+			int modMask = m & i;
+			int qtMask = (int)this->keyModMap.value((SDLKey)modMask, (Qt::KeyboardModifier)-1);
+			if(qtMask != -1){
+				qtM |= qtMask;
+			}
+		}
+		return (Qt::KeyboardModifier)qtM;
 	}
 }
