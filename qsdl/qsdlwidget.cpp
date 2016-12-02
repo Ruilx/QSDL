@@ -3,29 +3,31 @@
 #define setOk(v) if(ok){ *ok = (v); }
 
 void QSdlWidget::keyPressEvent(QKeyEvent *event){
-	Qt::KeyboardModifiers modifier = event->modifiers();
-	int key = event->key();
-	if((key & (~QKeyMask)) == 0){
-		event->ignore();
-		return;
-	}else{
-		key = key & QKeyMask;
-	}
-	QString keyStr = event->text();
-	qDebug() << "You [Pressed] key value is MOD:" << modifier << "KEY:" << QString::number(key, 16) << "STR:" << keyStr;
+//	Qt::KeyboardModifiers modifier = event->modifiers();
+//	int key = event->key();
+//	if((key & (~QKeyMask)) == 0){
+//		event->ignore();
+//		return;
+//	}else{
+//		key = key & QKeyMask;
+//	}
+//	QString keyStr = event->text();
+//	qDebug() << "You [Pressed] key value is MOD:" << modifier << "KEY:" << QString::number(key, 16) << "STR:" << keyStr;
+	QWidget::keyPressEvent(event);
 }
 
 void QSdlWidget::keyReleaseEvent(QKeyEvent *event){
-	Qt::KeyboardModifiers modifier = event->modifiers();
-	int key = event->key();
-	if((key & (~QKeyMask)) == 0){
-		event->ignore();
-		return;
-	}else{
-		key = key & QKeyMask;
-	}
-	QString keyStr = event->text();
-	qDebug() << "You (Release) key value is MOD:" << modifier << "KEY:" << QString::number(key, 16) << "STR:" << keyStr;
+//	Qt::KeyboardModifiers modifier = event->modifiers();
+//	int key = event->key();
+//	if((key & (~QKeyMask)) == 0){
+//		event->ignore();
+//		return;
+//	}else{
+//		key = key & QKeyMask;
+//	}
+//	QString keyStr = event->text();
+//	qDebug() << "You (Release) key value is MOD:" << modifier << "KEY:" << QString::number(key, 16) << "STR:" << keyStr;
+	QWidget::keyReleaseEvent(event);
 }
 
 void QSdlWidget::createSdlEventThread(QSdlEvent *eventObject){
@@ -75,7 +77,7 @@ QSdlWidget::QSdlWidget(QSdlWidget::QSdlInitDevices devices, QWidget *parent, Qt:
 	//this->resize(SDL_GetVideoInfo()->current_w, SDL_GetVideoInfo()->current_h);
 	this->setFixedSize(SDL_GetVideoInfo()->current_w, SDL_GetVideoInfo()->current_h);
 
-	SDL_Surface *s = SDL_LoadBMP(QString(QDir::currentPath() + "/data/background/bg.bmp").toLocal8Bit().data());
+	SDL_Surface *s = SDL_LoadBMP(QString(QDir::currentPath() + "/data/background/loading.bmp").toLocal8Bit().data());
 
 	SDL_BlitSurface(s, nullptr, this->mainSurface, nullptr);
 	SDL_Flip(s);
@@ -110,13 +112,22 @@ QSdlWidget::~QSdlWidget(){
 		qDebug() << "SDL_PushEvent failed:" << SDL_GetError();
 		return;
 	}
+//	while(!this->threadList.isEmpty()){
+//		QThread *t = (this->threadList.takeLast());
+//		if(t != nullptr){
+//			(t)->quit();
+//			(t)->wait();
+//			delete (t);
+//			t = nullptr;
+//		}
+//	}
 
-	for(QThread *t: this->threadList){
-		if(t != nullptr){
-			t->quit();
-			t->wait();
-			delete t;
-			t = nullptr;
+	for(int i = 0; i < this->threadList.length(); i++){
+		if(this->threadList.at(i) != nullptr){
+			this->threadList.at(i)->quit();
+			this->threadList.at(i)->wait();
+			delete this->threadList.at(i);
+			this->threadList[i] = nullptr;
 		}
 	}
 	this->quit();

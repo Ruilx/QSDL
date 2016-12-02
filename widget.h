@@ -9,22 +9,19 @@ class Widget : public QWidget
 {
 	Q_OBJECT
 	QSdlWidget *w;
-	QLabel *l = new QLabel("This is a normal Qt label =====================", this);
+	QLabel *l = new QLabel("The Widget Above, is a SDL widget ^_^", this);
 
-//	void keyPressEvent(QKeyEvent *event);
+	void keyPressEvent(QKeyEvent *event);
 	void mousePressEvent(QMouseEvent *event);
-//	bool nativeEvent(const QByteArray &eventType, void *message, long *result){
-//		qDebug() << "Event Entry";
-//	}
 	void mouseMoveEvent(QMouseEvent *event){
-		qDebug() << "type:" << event->type()
-				 << "buttons:" << event->buttons()
-				 << "button:" << event->button()
-				 << "pos:" << event->pos()
-				 << "local pos:" << event->localPos()
-				 << "screen pos:" << event->screenPos()
-				 << "global pos:" << event->globalPos()
-				 << "modifiers:" << event->modifiers();
+//		qDebug() << "type:" << event->type()
+//				 << "buttons:" << event->buttons()
+//				 << "button:" << event->button()
+//				 << "pos:" << event->pos()
+//				 << "local pos:" << event->localPos()
+//				 << "screen pos:" << event->screenPos()
+//				 << "global pos:" << event->globalPos()
+//				 << "modifiers:" << event->modifiers();
 	}
 
 public:

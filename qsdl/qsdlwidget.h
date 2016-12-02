@@ -30,15 +30,14 @@ class QSdlWidget : public QWidget
 	void keyPressEvent(QKeyEvent *event);
 	void keyReleaseEvent(QKeyEvent *event);
 	void mouseMoveEvent(QMouseEvent *event){
-		int mouseButtons = event->buttons();
-		if((mouseButtons & (~QMouseButtonMask)) == 0){
-			event->ignore();
-			return;
-		}else{
-			mouseButtons = mouseButtons & QMouseButtonMask;
-		}
-		qDebug() << "You move the mouse LOC:" << event->pos() << "KEY:" << (Qt::MouseButtons)mouseButtons;
-
+//		int mouseButtons = event->buttons();
+//		if((mouseButtons & (~QMouseButtonMask)) == 0){
+//			event->ignore();
+//			return;
+//		}else{
+//			mouseButtons = mouseButtons & QMouseButtonMask;
+//		}
+//		qDebug() << "You move the mouse LOC:" << event->pos() << "KEY:" << (Qt::MouseButtons)mouseButtons;
 		QWidget::mouseMoveEvent(event);
 	}
 
@@ -229,7 +228,8 @@ private slots:
 				qDebug() << "QSdlWidget::joinThread | The Thread has already been freed.";
 				return;
 			}else{
-				qDebug() << "QSdlWidget::joinThread | Given thread " << quitedThread << " is not in the threadList, this thread will not be freed.";
+				qDebug() << "QSdlWidget::joinThread | Given thread is not in the threadList, this thread will not be freed.";
+				qDebug() << "or this thread has been deleted except a no-nullptr pointer";
 			}
 		}else{
 			if(quitedThread != nullptr){
