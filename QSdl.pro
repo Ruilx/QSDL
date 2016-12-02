@@ -39,6 +39,7 @@ HEADERS  += widget.h \
     QSdl/com/qsdlmousemap.h
 
 win32: LIBS += -L$$PWD/lib/ -llibSDL.dll
+win32: LIBS += -L$$PWD/lib/ -lSDL_image
 
 INCLUDEPATH += $$PWD/include
 DEPENDPATH += $$PWD/include
