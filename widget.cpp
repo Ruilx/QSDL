@@ -24,20 +24,29 @@ Widget::Widget(QWidget *parent, Qt::WindowFlags f)
 
 	try{
 		if(!this->w->setupSurface(640, 480, QSdlSurface::Sdl_32Bits, (QSdlSurface::SdlSurfaceFlags)(QSdlSurface::Sdl_SwSurface | QSdlSurface::Sdl_DoubleBuf))){
-			throw QString("Error");
+			throw QString("Error setupSurface");
 		}
 
 		QSdlSurface *surface = new QSdlSurface();
 		if(!surface->loadImage("data/background/title.bmp")){
-			throw QString("Error2");
+			throw QString("Error loadImage");
 		}
+//		bool ok = false;
+//		QSdlImage *surface = new QSdlImage(QSdlImage::QSdl_ImgCommon, &ok);
+//		if(ok == false){
+//			throw QString("Error QSdlImage");
+//		}else{
+//			if(!surface->loadImage("data/background/title.png")){
+//				throw QString("Error loadImage");
+//			}
+//		}
 
 		if(!this->w->blitSurface(surface)){
-			throw QString("Error3");
+			throw QString("Error blitSurface");
 		}
 
 		if(!this->w->update()){
-			throw QString("Error4");
+			throw QString("Error update");
 		}
 	}catch(QString str){
 		qDebug() << str << ":" << SDL_GetError();

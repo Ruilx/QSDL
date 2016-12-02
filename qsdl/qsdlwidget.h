@@ -8,6 +8,7 @@
 #include "qsdlexception.h"
 #include "qsdlevent.h"
 #include "com/qsdlsurface.h"
+#include "com/qsdlimage.h"
 
 #define QKeyMask 0x0FFFFFFF
 #define QMouseButtonMask 0x0FFFFFFF

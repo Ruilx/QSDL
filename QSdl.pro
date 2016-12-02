@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     QSdl/com/qsdlvideoinfo.cpp \
     QSdl/com/qsdlkeyboardmap.cpp \
     QSdl/qsdlevent.cpp \
-    QSdl/com/qsdlmousemap.cpp
+    QSdl/com/qsdlmousemap.cpp \
+    QSdl/com/qsdlimage.cpp
 
 HEADERS  += widget.h \
     QSdl/global.h \
@@ -36,7 +37,8 @@ HEADERS  += widget.h \
     QSdl/com/qsdlvideoinfo.h \
     QSdl/com/qsdlkeyboardmap.h \
     QSdl/qsdlevent.h \
-    QSdl/com/qsdlmousemap.h
+    QSdl/com/qsdlmousemap.h \
+    QSdl/com/qsdlimage.h
 
 win32: LIBS += -L$$PWD/lib/ -llibSDL.dll
 win32: LIBS += -L$$PWD/lib/ -lSDL_image
