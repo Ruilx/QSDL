@@ -1,33 +1,43 @@
 #include "qsdlwidget.h"
 
-#define setOk(v) if(ok){ *ok = (v); }
+//void QSdlWidget::keyPressEvent(QKeyEvent *event){
+////	Qt::KeyboardModifiers modifier = event->modifiers();
+////	int key = event->key();
+////	if((key & (~QKeyMask)) == 0){
+////		event->ignore();
+////		return;
+////	}else{
+////		key = key & QKeyMask;
+////	}
+////	QString keyStr = event->text();
+////	qDebug() << "You [Pressed] key value is MOD:" << modifier << "KEY:" << QString::number(key, 16) << "STR:" << keyStr;
+//	QWidget::keyPressEvent(event);
+//}
 
-void QSdlWidget::keyPressEvent(QKeyEvent *event){
-//	Qt::KeyboardModifiers modifier = event->modifiers();
-//	int key = event->key();
-//	if((key & (~QKeyMask)) == 0){
-//		event->ignore();
-//		return;
-//	}else{
-//		key = key & QKeyMask;
-//	}
-//	QString keyStr = event->text();
-//	qDebug() << "You [Pressed] key value is MOD:" << modifier << "KEY:" << QString::number(key, 16) << "STR:" << keyStr;
-	QWidget::keyPressEvent(event);
-}
+//void QSdlWidget::keyReleaseEvent(QKeyEvent *event){
+////	Qt::KeyboardModifiers modifier = event->modifiers();
+////	int key = event->key();
+////	if((key & (~QKeyMask)) == 0){
+////		event->ignore();
+////		return;
+////	}else{
+////		key = key & QKeyMask;
+////	}
+////	QString keyStr = event->text();
+////	qDebug() << "You (Release) key value is MOD:" << modifier << "KEY:" << QString::number(key, 16) << "STR:" << keyStr;
+//	QWidget::keyReleaseEvent(event);
+//}
 
-void QSdlWidget::keyReleaseEvent(QKeyEvent *event){
-//	Qt::KeyboardModifiers modifier = event->modifiers();
-//	int key = event->key();
-//	if((key & (~QKeyMask)) == 0){
-//		event->ignore();
-//		return;
-//	}else{
-//		key = key & QKeyMask;
-//	}
-//	QString keyStr = event->text();
-//	qDebug() << "You (Release) key value is MOD:" << modifier << "KEY:" << QString::number(key, 16) << "STR:" << keyStr;
-	QWidget::keyReleaseEvent(event);
+void QSdlWidget::mouseMoveEvent(QMouseEvent *event){
+	//		int mouseButtons = event->buttons();
+	//		if((mouseButtons & (~QMouseButtonMask)) == 0){
+	//			event->ignore();
+	//			return;
+	//		}else{
+	//			mouseButtons = mouseButtons & QMouseButtonMask;
+	//		}
+	//		qDebug() << "You move the mouse LOC:" << event->pos() << "KEY:" << (Qt::MouseButtons)mouseButtons;
+	QWidget::mouseMoveEvent(event);
 }
 
 void QSdlWidget::createSdlEventThread(QSdlEvent *eventObject){
@@ -73,15 +83,6 @@ QSdlWidget::QSdlWidget(QSdlWidget::QSdlInitDevices devices, QWidget *parent, Qt:
 		throw;
 	}
 
-	this->mainSurface = SDL_SetVideoMode(640, 480, 8, SDL_SWSURFACE | SDL_DOUBLEBUF);
-	//this->resize(SDL_GetVideoInfo()->current_w, SDL_GetVideoInfo()->current_h);
-	this->setFixedSize(SDL_GetVideoInfo()->current_w, SDL_GetVideoInfo()->current_h);
-
-	SDL_Surface *s = SDL_LoadBMP(QString(QDir::currentPath() + "/data/background/loading.bmp").toLocal8Bit().data());
-
-	SDL_BlitSurface(s, nullptr, this->mainSurface, nullptr);
-	SDL_Flip(s);
-
 	setOk(true);
 
 	this->createSdlEventThread(this->sdlEvent);
@@ -100,6 +101,8 @@ QSdlWidget::QSdlWidget(QWidget *parent, Qt::WindowFlags flags, bool *ok)throw(QS
 	}
 
 	setOk(true);
+
+	this->createSdlEventThread(this->sdlEvent);
 
 }
 
@@ -162,6 +165,17 @@ void QSdlWidget::quit() Q_DECL_NOTHROW
 {
 	SDL_QuitSubSystem(this->initDevices);
 	SDL_Quit();
+}
+
+bool QSdlWidget::setupSurface(int width, int height, QSdlSurface::SdlSurfaceScreenBpp bpp, QSdlSurface::SdlSurfaceFlags flags){
+	bool ok = false;
+	this->mainSurface = new QSdlSurface(width, height, bpp, flags, this, &ok);
+	if(ok == true){
+		return true;
+	}else{
+		this->mainSurface = nullptr;
+		return false;
+	}
 }
 
 void QSdlWidget::setToEnvironment(QString name, QString value)
@@ -294,4 +308,56 @@ void QSdlWidget::SetVideoSdlWindowId(WId wid)
 void QSdlWidget::SetAudioSdlAudioDriver(QSdlWidget::QSdlAudioDriver driver)
 {
 	this->setToEnvironment(this->getEnvironmentNameInTheList(Sdl_AudioDriver), this->getAudioDriverNameInTheList(driver));
+}
+
+bool QSdlWidget::update(){
+	return this->mainSurface->updateSurface();
+}
+
+void QSdlWidget::sdlEventShowHideSlot(bool show){
+	if(show){
+		QApplication::sendEvent(this, new QShowEvent());
+	}else{
+		QApplication::sendEvent(this, new QHideEvent());
+	}
+}
+
+void QSdlWidget::sdlEventKeySigSlot(int eventType, int eventKey, int eventModifiers, QString text){
+	QEvent::Type type = (QEvent::Type)eventType;
+	int key = (int)(eventKey  | 0x10000000);
+	Qt::KeyboardModifiers modifiers = (Qt::KeyboardModifiers)eventModifiers;
+	if(type == QEvent::KeyPress || type == QEvent::KeyRelease){
+		QKeyEvent e(type, (Qt::Key)key, modifiers, text);
+		QApplication::sendEvent(this, &e);
+	}
+}
+
+void QSdlWidget::sdlEventQuitSlot(){
+}
+
+void QSdlWidget::sdlEventMouseMoveSigSlot(int eventMouseButtons, QPoint location){
+	int mouseButtons = (int)(eventMouseButtons | 0x10000000);
+	QMouseEvent e(QEvent::MouseMove, location, (Qt::MouseButton)0, (Qt::MouseButtons)mouseButtons, Qt::NoModifier);
+	QApplication::sendEvent(this, &e);
+}
+
+void QSdlWidget::joinThread(QThread *quitedThread){
+	if(!this->threadList.removeOne(quitedThread)){
+		if(quitedThread == nullptr){
+			qDebug() << "QSdlWidget::joinThread | The Thread has already been freed.";
+			return;
+		}else{
+			qDebug() << "QSdlWidget::joinThread | Given thread is not in the threadList, this thread will not be freed.";
+			qDebug() << "or this thread has been deleted except a no-nullptr pointer";
+		}
+	}else{
+		if(quitedThread != nullptr){
+			quitedThread->quit();
+			quitedThread->wait();
+			delete quitedThread;
+			quitedThread = nullptr;
+		}else{
+			qDebug() << "QSdlWidget::joinThread | The Thread has already been freed.";
+		}
+	}
 }

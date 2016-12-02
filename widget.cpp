@@ -1,51 +1,10 @@
 #include "widget.h"
 
-void Widget::keyPressEvent(QKeyEvent *event)
-{
-	Qt::KeyboardModifiers modifier = event->modifiers();
-	int key = event->key();
-	QString keyStr = event->text();
-	switch(key){
-		case Qt::Key_Escape:
-			qDebug() << "You Pressed Escape key!";
-		default:
-			qDebug() << "You Pressed key value is MOD:" << modifier << "KEY:" << key << "STR:" << keyStr;
-	}
-
-	QWidget::keyPressEvent(event);
-}
-
-void Widget::mousePressEvent(QMouseEvent *event)
-{
-//	Qt::MouseButtons buttons = event->buttons();
-//	QString str = "You Pressed Mouse: ";
-//	if(buttons & Qt::LeftButton){
-//		str.append("Left ");
-//	}
-//	if(buttons & Qt::RightButton){
-//		str.append("Right ");
-//	}
-//	if(buttons & Qt::MidButton){
-//		str.append("Mid ");
-//	}
-//	if(buttons & Qt::BackButton){
-//		str.append("Back ");
-//	}
-//	if(buttons & Qt::ForwardButton){
-//		str.append("Forward ");
-//	}
-//	str.append(tr("at (%1, %2)").arg(event->x()).arg(event->y()));
-
-//	qDebug() << str;
-
-//	QWidget::mousePressEvent(event);
-}
-
 Widget::Widget(QWidget *parent, Qt::WindowFlags f)
 	: QWidget(parent, f)
 {
 	try{
-		this->w = new QSdlWidget(QSdlWidget::Sdl_InitVideo, this);
+		this->w = new QSdlWidget(QSdlWidget::Sdl_InitEverything, this);
 
 	}catch(QSdlException e){
 		QMessageBox::critical(this, QApplication::applicationDisplayName(), e.getErrorString(), QMessageBox::Ok);
@@ -61,7 +20,30 @@ Widget::Widget(QWidget *parent, Qt::WindowFlags f)
 	lay->setMargin(0);
 	//lay->setSizeConstraint(QLayout::SetFixedSize);
 
-	this->setMouseTracking(true);
+	//this->setMouseTracking(true);
+
+	try{
+		if(!this->w->setupSurface(640, 480, QSdlSurface::Sdl_32Bits, (QSdlSurface::SdlSurfaceFlags)(QSdlSurface::Sdl_SwSurface | QSdlSurface::Sdl_DoubleBuf))){
+			throw QString("Error");
+		}
+
+		QSdlSurface *surface = new QSdlSurface();
+		if(!surface->loadImage("data/background/title.bmp")){
+			throw QString("Error2");
+		}
+
+		if(!this->w->blitSurface(surface)){
+			throw QString("Error3");
+		}
+
+		if(!this->w->update()){
+			throw QString("Error4");
+		}
+	}catch(QString str){
+		qDebug() << str << ":" << SDL_GetError();
+		return;
+	}
+
 
 }
 

@@ -7,6 +7,7 @@
 #include "global.h"
 #include "qsdlexception.h"
 #include "qsdlevent.h"
+#include "com/qsdlsurface.h"
 
 #define QKeyMask 0x0FFFFFFF
 #define QMouseButtonMask 0x0FFFFFFF
@@ -18,7 +19,8 @@ class QSdlWidget : public QWidget
 	QSdlEvent *sdlEvent = new QSdlEvent();
 	QList<QThread*> threadList;
 
-	SDL_Surface *mainSurface = nullptr;
+	//SDL_Surface *mainSurface = nullptr;
+	QSdlSurface *mainSurface = nullptr;
 
 	QPaintEngine *paintEngine() const { return nullptr; }
 
@@ -27,19 +29,9 @@ class QSdlWidget : public QWidget
 		QWidget::closeEvent(event);
 	}
 
-	void keyPressEvent(QKeyEvent *event);
-	void keyReleaseEvent(QKeyEvent *event);
-	void mouseMoveEvent(QMouseEvent *event){
-//		int mouseButtons = event->buttons();
-//		if((mouseButtons & (~QMouseButtonMask)) == 0){
-//			event->ignore();
-//			return;
-//		}else{
-//			mouseButtons = mouseButtons & QMouseButtonMask;
-//		}
-//		qDebug() << "You move the mouse LOC:" << event->pos() << "KEY:" << (Qt::MouseButtons)mouseButtons;
-		QWidget::mouseMoveEvent(event);
-	}
+	//void keyPressEvent(QKeyEvent *event);
+	//void keyReleaseEvent(QKeyEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
 
 	void createSdlEventThread(QSdlEvent *eventObject);
 
@@ -64,6 +56,11 @@ public:
 
 	void quitSubSystem(QSdlInitDevices devices) Q_DECL_NOTHROW;
 	void quit() Q_DECL_NOTHROW;
+
+	bool setupSurface(int width, int height, QSdlSurface::SdlSurfaceScreenBpp bpp, QSdlSurface::SdlSurfaceFlags flags = QSdlSurface::Sdl_SwSurface);
+	bool blitSurface(QSdlSurface *surface, const QPoint &loc = QPoint(0, 0), const QRect &croppingArea = QRect()){
+		return this->mainSurface->blitSurface(surface, loc, croppingArea);
+	}
 
 private:
 	QSdlInitDevices initDevices = (QSdlInitDevices)0;
@@ -189,59 +186,22 @@ public:
 
 	void SetAudioSdlAudioDriver(QSdlAudioDriver driver);
 
+	bool update();
 
 signals:
 
 public slots:
 
 private slots:
-	void sdlEventShowHideSlot(bool show){
-		if(show){
-			QApplication::sendEvent(this, new QShowEvent());
-		}else{
-			QApplication::sendEvent(this, new QHideEvent());
-		}
-	}
+	void sdlEventShowHideSlot(bool show);
 
-	void sdlEventKeySigSlot(int eventType, int eventKey, int eventModifiers, QString text){
-		QEvent::Type type = (QEvent::Type)eventType;
-		int key = (int)(eventKey  | 0x10000000);
-		Qt::KeyboardModifiers modifiers = (Qt::KeyboardModifiers)eventModifiers;
-		if(type == QEvent::KeyPress || type == QEvent::KeyRelease){
-			QKeyEvent e(type, (Qt::Key)key, modifiers, text);
-			QApplication::sendEvent(this, &e);
-		}
-	}
+	void sdlEventKeySigSlot(int eventType, int eventKey, int eventModifiers, QString text);
 
-	void sdlEventQuitSlot(){
-	}
+	void sdlEventQuitSlot();
 
-	void sdlEventMouseMoveSigSlot(int eventMouseButtons, QPoint location){
-		int mouseButtons = (int)(eventMouseButtons | 0x10000000);
-		QMouseEvent e(QEvent::MouseMove, location, (Qt::MouseButton)0, (Qt::MouseButtons)mouseButtons, Qt::NoModifier);
-		QApplication::sendEvent(this, &e);
-	}
+	void sdlEventMouseMoveSigSlot(int eventMouseButtons, QPoint location);
 
-	void joinThread(QThread *quitedThread){
-		if(!this->threadList.removeOne(quitedThread)){
-			if(quitedThread == nullptr){
-				qDebug() << "QSdlWidget::joinThread | The Thread has already been freed.";
-				return;
-			}else{
-				qDebug() << "QSdlWidget::joinThread | Given thread is not in the threadList, this thread will not be freed.";
-				qDebug() << "or this thread has been deleted except a no-nullptr pointer";
-			}
-		}else{
-			if(quitedThread != nullptr){
-				quitedThread->quit();
-				quitedThread->wait();
-				delete quitedThread;
-				quitedThread = nullptr;
-			}else{
-				qDebug() << "QSdlWidget::joinThread | The Thread has already been freed.";
-			}
-		}
-	}
+	void joinThread(QThread *quitedThread);
 };
 
 #endif // QSDL_H
