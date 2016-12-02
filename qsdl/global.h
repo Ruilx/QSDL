@@ -8,4 +8,6 @@
 #define Pure =0
 #define ExternC extern "C"
 
+#define setOk(v) if(ok){ *ok = (v); }
+
 #endif // GLOBAL_H
