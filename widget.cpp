@@ -27,19 +27,19 @@ Widget::Widget(QWidget *parent, Qt::WindowFlags f)
 			throw QString("Error setupSurface");
 		}
 
-		QSdlSurface *surface = new QSdlSurface();
-		if(!surface->loadImage("data/background/title.bmp")){
-			throw QString("Error loadImage");
-		}
-//		bool ok = false;
-//		QSdlImage *surface = new QSdlImage(QSdlImage::QSdl_ImgCommon, &ok);
-//		if(ok == false){
-//			throw QString("Error QSdlImage");
-//		}else{
-//			if(!surface->loadImage("data/background/title.png")){
-//				throw QString("Error loadImage");
-//			}
+//		QSdlSurface *surface = new QSdlSurface();
+//		if(!surface->loadImage("data/background/title.bmp")){
+//			throw QString("Error loadImage");
 //		}
+		bool ok = false;
+		QSdlImage *surface = new QSdlImage(QSdlImage::QSdl_ImgCommon, &ok);
+		if(ok == false){
+			throw QString("Error QSdlImage");
+		}else{
+			if(!surface->loadImage("data/background/title.png")){
+				throw QString("Error loadImage");
+			}
+		}
 
 		if(!this->w->blitSurface(surface)){
 			throw QString("Error blitSurface");
@@ -53,6 +53,8 @@ Widget::Widget(QWidget *parent, Qt::WindowFlags f)
 		return;
 	}
 
+	this->sound->setLoops(QSound::Infinite);
+	this->sound->play();
 
 }
 

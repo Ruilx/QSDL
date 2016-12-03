@@ -206,7 +206,9 @@ Makefile: QSdl.pro D:/Qt5.7.0/5.7/mingw53_32/mkspecs/win32-g++/qmake.conf D:/Qt5
 		QSdl.pro \
 		D:/Qt5.7.0/5.7/mingw53_32/lib/qtmaind.prl \
 		D:/Qt5.7.0/5.7/mingw53_32/lib/Qt5Widgets.prl \
+		D:/Qt5.7.0/5.7/mingw53_32/lib/Qt5Multimedia.prl \
 		D:/Qt5.7.0/5.7/mingw53_32/lib/Qt5Gui.prl \
+		D:/Qt5.7.0/5.7/mingw53_32/lib/Qt5Network.prl \
 		D:/Qt5.7.0/5.7/mingw53_32/lib/Qt5Core.prl
 	$(QMAKE) -spec win32-g++ CONFIG+=debug CONFIG+=qml_debug -o Makefile QSdl.pro
 D:/Qt5.7.0/5.7/mingw53_32/mkspecs/features/spec_pre.prf:
@@ -356,7 +358,9 @@ D:/Qt5.7.0/5.7/mingw53_32/mkspecs/features/lex.prf:
 QSdl.pro:
 D:/Qt5.7.0/5.7/mingw53_32/lib/qtmaind.prl:
 D:/Qt5.7.0/5.7/mingw53_32/lib/Qt5Widgets.prl:
+D:/Qt5.7.0/5.7/mingw53_32/lib/Qt5Multimedia.prl:
 D:/Qt5.7.0/5.7/mingw53_32/lib/Qt5Gui.prl:
+D:/Qt5.7.0/5.7/mingw53_32/lib/Qt5Network.prl:
 D:/Qt5.7.0/5.7/mingw53_32/lib/Qt5Core.prl:
 qmake: FORCE
 	@$(QMAKE) -spec win32-g++ CONFIG+=debug CONFIG+=qml_debug -o Makefile QSdl.pro
