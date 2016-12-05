@@ -24,7 +24,12 @@ SOURCES += main.cpp\
     QSdl/com/qsdlkeyboardmap.cpp \
     QSdl/qsdlevent.cpp \
     QSdl/com/qsdlmousemap.cpp \
-    QSdl/com/qsdlimage.cpp
+    QSdl/com/qsdlimage.cpp \
+	QSdl/com/qsdlmixer.cpp \
+    QSdl/qsdlmusic.cpp \
+    QSdl/qsdlsound.cpp \
+    QSdl/com/qsdlcolor.cpp \
+    QSdl/qsdlfontimage.cpp
 
 HEADERS  += widget.h \
     QSdl/global.h \
@@ -38,10 +43,17 @@ HEADERS  += widget.h \
     QSdl/com/qsdlkeyboardmap.h \
     QSdl/qsdlevent.h \
     QSdl/com/qsdlmousemap.h \
-    QSdl/com/qsdlimage.h
+    QSdl/com/qsdlimage.h \
+	QSdl/com/qsdlmixer.h \
+    QSdl/qsdlmusic.h \
+    QSdl/qsdlsound.h \
+    QSdl/com/qsdlcolor.h \
+    QSdl/qsdlfontimage.h
 
 win32: LIBS += -L$$PWD/lib/ -llibSDL.dll
 win32: LIBS += -L$$PWD/lib/ -lSDL_image
+win32: LIBS += -L$$PWD/lib/ -lSDL_mixer
+win32: LIBS += -L$$PWD/lib/ -lSDL_ttf
 
 INCLUDEPATH += $$PWD/include
 DEPENDPATH += $$PWD/include
