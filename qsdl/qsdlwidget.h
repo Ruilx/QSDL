@@ -9,6 +9,7 @@
 #include "qsdlevent.h"
 #include "com/qsdlsurface.h"
 #include "com/qsdlimage.h"
+#include "qsdlmusic.h"
 
 #define QKeyMask 0x0FFFFFFF
 #define QMouseButtonMask 0x0FFFFFFF
@@ -19,6 +20,7 @@ class QSdlWidget : public QWidget
 	QWidget *parent = nullptr;
 	QSdlEvent *sdlEvent = new QSdlEvent();
 	QList<QThread*> threadList;
+	QSdlMusic *_bgm = new QSdlMusic(QSdlMixer::Sdl_InitCommon, this);
 
 	//SDL_Surface *mainSurface = nullptr;
 	QSdlSurface *mainSurface = nullptr;
@@ -188,6 +190,8 @@ public:
 	void SetAudioSdlAudioDriver(QSdlAudioDriver driver);
 
 	bool update();
+
+	QSdlMusic *bgm() const{ return this->_bgm; }
 
 signals:
 

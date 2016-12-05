@@ -42,9 +42,6 @@ public:
 	};
 
 protected:
-	QSdlSurface(SDL_Surface *surface){
-		this->surface = surface;
-	}
 
 	void setSurface(SDL_Surface *surface){
 		this->surface = surface;
@@ -66,6 +63,10 @@ protected:
 	}
 
 public:
+	QSdlSurface(SDL_Surface *surface){
+		this->surface = surface;
+	}
+
 	QSdlSurface(){
 		this->surface = nullptr;
 	}
